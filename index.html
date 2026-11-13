@@ -339,7 +339,7 @@ function renderCerts(){const body=document.getElementById('cebody');if(!body)ret
  CERTS.forEach((c,i)=>{const gn=c.g?c.g[L]:'';if(q&&!(c.t[L]+' '+(c.o||'')+' '+gn).toLowerCase().includes(q))return;k++;
   if(gn&&gn!==pg){h+='<div class="cgh">'+esc(gn)+'</div>';pg=gn}
   const im=c.id?'https://drive.google.com/thumbnail?id='+c.id+'&sz=w160':c.img||'';
-  h+='<button type="button" class="cr" data-i="'+i+'"'+(c.pdf?' data-pdf="'+esc(c.pdf)+'"':'')+'><span class="th">'+CICON+(im&&!c.pdf?'<img src="'+esc(im)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">':'')+'</span><span class="tx"><b>'+esc(c.t[L])+'</b>'+(c.o||c.d?'<small>'+esc([c.o,c.d&&(c.d[L]||c.d)].filter(Boolean).join(' · '))+'</small>':'')+'</span><svg class="ch" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6"/></svg></button>'});
+  h+='<button type="button" class="cr" data-i="'+i+'"'+(c.pdf?' data-pdf="'+esc(c.pdf)+'"':'')+' aria-haspopup="dialog"><span class="th">'+CICON+(im&&!c.pdf?'<img src="'+esc(im)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">':'')+'</span><span class="tx"><b>'+esc(c.t[L])+'</b>'+(c.o||c.d?'<small>'+esc([c.o,c.d&&(c.d[L]||c.d)].filter(Boolean).join(' · '))+'</small>':'')+'</span><svg class="ch" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6"/></svg></button>'});
  body.innerHTML=k?h:'<div class="cno">'+esc(D.cno)+'</div>';
  const x=document.getElementById('cmo-x');if(x)x.textContent=D.cclose;
  const bk=document.querySelector('#cepage .bk');if(bk)bk.setAttribute('aria-label',D.cvback);
@@ -359,9 +359,6 @@ function renderCerts(){const body=document.getElementById('cebody');if(!body)ret
   else note(D.cnop)};
  const close=()=>{if(!mo.classList.contains('on'))return;tok++;mo.classList.remove('on');mo.setAttribute('aria-hidden','true');cmp.textContent='';cmp.classList.remove('pdf');if(last&&document.contains(last))last.focus()};
  body.addEventListener('click',e=>{const b=e.target.closest('button.cr');if(!b)return;const c=CERTS[b.dataset.i];last=b;
-  /* فتح الشهادة مباشرة في نافذة جديدة بدون معاينة */
-  const url=c.pdf?encodeURI(c.pdf):c.id?'https://drive.google.com/file/d/'+c.id+'/view':c.img||c.v||'';
-  if(url){window.open(url,'_blank','noopener');return}
   t.textContent=c.t[L];preview(c);
   vb.hidden=!c.v;if(c.v){vb.href=c.v;vb.textContent=D.cverify}
   db.hidden=!c.pdf;if(c.pdf){db.href=encodeURI(c.pdf);db.setAttribute('download',c.pdf.split('/').pop());db.textContent=D.cdl}
