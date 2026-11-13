@@ -315,9 +315,7 @@ const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
    id  = ملف على Google Drive           img = رابط صورة                 (بدائل لو مفيش pdf)
    مثال: {pdf:'certs/coursera-ai.pdf',v:'https://coursera.org/verify/...',t:{ar:'اسم الشهادة',en:'Certificate name'},o:'Coursera',d:{ar:'أغسطس 2026',en:'Aug 2026'}} */
 const CERTS=[
- {id:'14vTRzVN0wM5-3s5yTRiVUKdtMS7pqU46',t:{ar:'شهادة Coursera',en:'Coursera Certificate'},o:'Coursera'},
- {v:'https://www.linkedin.com/learning/certificates/1266ea3191747470c112cb6c03caa1f57cb7f239ec94653607165f6d6c00eb5c?trk=share_certificate',t:{ar:'شهادة LinkedIn Learning',en:'LinkedIn Learning Certificate'},o:'LinkedIn Learning',
-  id:'149TbIlcQ9iZkKnKVxPBxcnRLEbW-Edju'}
+ {pdf:'certs/Coursera_Google_AI_Essentials.pdf',t:{ar:'Google AI Essentials',en:'Google AI Essentials'},o:'Coursera'}
 ];
 const CICON='<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5zM14 3v5h5M9 13h6M9 17h6"/></svg>';
 /* عرض الـPDF بمكتبة PDF.js (بتتحمّل أول ما تحتاجها) عشان يشتغل على كل الموبايلات */
