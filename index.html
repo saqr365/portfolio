@@ -335,9 +335,12 @@ const PJV='3.11.174',PJB='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/'+PJV+'/
 const loadPJ=()=>pjP||(pjP=new Promise((ok,no)=>{const sc=document.createElement('script');sc.src=PJB+'pdf.min.js';sc.onload=()=>{pdfjsLib.GlobalWorkerOptions.workerSrc=PJB+'pdf.worker.min.js';ok(pdfjsLib)};sc.onerror=()=>{pjP=null;no(new Error('pdfjs'))};document.head.appendChild(sc)}));
 const pdfDoc=path=>loadPJ().then(l=>l.getDocument(encodeURI(path)).promise);
 const THM=new Map();
+/* صورة المعاينة: certs/preview/اسم-الـPDF.png بتتعرف لوحدها لو موجودة (أو pv يدوي) */
+const pvOf=c=>c.pv||(c.pdf?'certs/preview/'+c.pdf.split('/').pop().replace(/\.pdf$/i,'.png'):'');
+const loadImg=u=>new Promise(ok=>{const m=new Image();m.onload=()=>ok(u);m.onerror=()=>ok(null);m.src=u});
 async function thumbs(){if(thumbs.busy)return;thumbs.busy=true;
  try{for(const r of document.querySelectorAll('#cebody .cr[data-pdf]')){const th=r.querySelector('.th');if(!th||th.querySelector('img'))continue;const path=r.dataset.pdf;
-  try{let u=THM.get(path);if(!u){const pg=await (await pdfDoc(path)).getPage(1),v1=pg.getViewport({scale:1}),vp=pg.getViewport({scale:200/v1.width}),cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;await pg.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;u=cv.toDataURL('image/jpeg',.82);THM.set(path,u)}
+  try{let u=THM.get(path);if(!u&&r.dataset.pv){u=await loadImg(r.dataset.pv);if(u)THM.set(path,u)}if(!u){const pg=await (await pdfDoc(path)).getPage(1),v1=pg.getViewport({scale:1}),vp=pg.getViewport({scale:200/v1.width}),cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;await pg.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;u=cv.toDataURL('image/jpeg',.82);THM.set(path,u)}
   if(!th.querySelector('img')){const im=document.createElement('img');im.alt='';im.src=u;th.appendChild(im)}}catch(e){}}}
  finally{thumbs.busy=false}}
 function renderCerts(){const body=document.getElementById('cebody');if(!body)return;
@@ -348,7 +351,7 @@ function renderCerts(){const body=document.getElementById('cebody');if(!body)ret
  CERTS.forEach((c,i)=>{const gn=c.g?c.g[L]:'';if(q&&!(c.t[L]+' '+(c.o||'')+' '+gn).toLowerCase().includes(q))return;k++;
   if(gn&&gn!==pg){h+='<div class="cgh">'+esc(gn)+'</div>';pg=gn}
   const im=c.id?'https://drive.google.com/thumbnail?id='+c.id+'&sz=w160':c.img||'';
-  h+='<button type="button" class="cr" data-i="'+i+'"'+(c.pdf?' data-pdf="'+esc(c.pdf)+'"':'')+' aria-haspopup="dialog"><span class="th">'+CICON+(im&&!c.pdf?'<img src="'+esc(im)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">':'')+'</span><span class="tx"><b>'+esc(c.t[L])+'</b>'+(c.o||c.d?'<small>'+esc([c.o,c.d&&(c.d[L]||c.d)].filter(Boolean).join(' · '))+'</small>':'')+'</span><svg class="ch" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6"/></svg></button>'});
+  h+='<button type="button" class="cr" data-i="'+i+'"'+(c.pdf?' data-pdf="'+esc(c.pdf)+'"'+(pvOf(c)?' data-pv="'+esc(encodeURI(pvOf(c)))+'"':''):'')+' aria-haspopup="dialog"><span class="th">'+CICON+(im&&!c.pdf?'<img src="'+esc(im)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">':'')+'</span><span class="tx"><b>'+esc(c.t[L])+'</b>'+(c.o||c.d?'<small>'+esc([c.o,c.d&&(c.d[L]||c.d)].filter(Boolean).join(' · '))+'</small>':'')+'</span><svg class="ch" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6"/></svg></button>'});
  body.innerHTML=k?h:'<div class="cno">'+esc(D.cno)+'</div>';
  const x=document.getElementById('cmo-x');if(x)x.textContent=D.cclose;
  const bk=document.querySelector('#cepage .bk');if(bk)bk.setAttribute('aria-label',D.cvback);
@@ -358,12 +361,14 @@ function renderCerts(){const body=document.getElementById('cebody');if(!body)ret
  const note=(txt)=>{const d=document.createElement('div');d.className='cmn';d.innerHTML=CICON.replace('width="24" height="24"','width="44" height="44"')+esc(txt);cmp.textContent='';cmp.appendChild(d)};
  const preview=c=>{cmp.textContent='';cmp.classList.remove('pdf');const tk=++tok;
   const fail=()=>{cmp.classList.remove('pdf');note(D.cfail)};
-  const pic=srcs=>{const m=document.createElement('img');m.alt=c.t[L];m.referrerPolicy='no-referrer';let k=0;m.onerror=()=>{k++;if(k<srcs.length)m.src=srcs[k];else fail()};m.src=srcs[0];cmp.appendChild(m)};
-  if(c.pv)pic([encodeURI(c.pv)]);
-  else if(c.pdf){cmp.classList.add('pdf');note(D.cload);
+  const pic=(srcs,fb)=>{const m=document.createElement('img');m.alt=c.t[L];m.referrerPolicy='no-referrer';let k=0;m.onerror=()=>{k++;if(k<srcs.length)m.src=srcs[k];else if(tk===tok)(fb||fail)()};m.src=srcs[0];cmp.appendChild(m)};
+  const viaPdf=()=>{cmp.textContent='';cmp.classList.add('pdf');note(D.cload);
    pdfDoc(c.pdf).then(async doc=>{if(tk!==tok)return;cmp.textContent='';const n=Math.min(doc.numPages,6),cw=Math.max(cmp.clientWidth,280),dpr=Math.min(window.devicePixelRatio||1,2.5);
     for(let i=1;i<=n;i++){const pg=await doc.getPage(i);if(tk!==tok)return;const v1=pg.getViewport({scale:1}),vp=pg.getViewport({scale:cw*dpr/v1.width}),cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;cmp.appendChild(cv);await pg.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise}
-   }).catch(()=>{if(tk===tok)fail()})}
+   }).catch(()=>{if(tk===tok)fail()})};
+  const pu=pvOf(c);
+  if(pu)pic([encodeURI(pu)],c.pdf?viaPdf:null);
+  else if(c.pdf)viaPdf();
   else if(c.id)pic(['https://drive.google.com/thumbnail?id='+c.id+'&sz=w1600','https://lh3.googleusercontent.com/d/'+c.id+'=w1600']);
   else if(c.img)pic([c.img]);
   else note(D.cnop)};
