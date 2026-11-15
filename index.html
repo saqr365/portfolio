@@ -370,7 +370,7 @@ function renderCerts(){const body=document.getElementById('cebody');if(!body)ret
   db.hidden=!c.pdf;if(c.pdf){db.href=encodeURI(c.pdf);db.setAttribute('download',c.pdf.split('/').pop());db.textContent=D.cdl}
   const of=c.pdf?encodeURI(c.pdf):c.id?'https://drive.google.com/file/d/'+c.id+'/view':'';ob.hidden=!of;if(of){ob.href=of;ob.textContent=D.copen}
   mo.classList.add('on');mo.setAttribute('aria-hidden','false');x.focus()});
- x.addEventListener('click',close);mo.addEventListener('click',e=>{if(e.target===mo)close()});
+ x.addEventListener('click',close);mo.addEventListener('click',e=>{const t=e.target;if(t===mo||t===cmp||t.classList.contains('cmt')||t.classList.contains('cma'))close()});
  addEventListener('keydown',e=>{if(e.key==='Escape'&&mo.classList.contains('on')){e.stopImmediatePropagation();close()}});
  addEventListener('popstate',close)})();
 (function(){const pg=document.getElementById('cepage');let pushed=false;
