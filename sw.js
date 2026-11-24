@@ -1,6 +1,6 @@
 /* Service worker: يخلّي الموقع قابل للتثبيت ويشتغل أوفلاين (الصفحة الرئيسية والصور الصغيرة) */
-const CACHE = 'saqr-portfolio-v5';
-const SHELL = ['./', 'index.html', 'manifest.json?v=7', 'favicon.ico?v=7', 'icon-192.png?v=7', 'icon-512.png?v=7', 'apple-touch-icon.png?v=7', 'avatar.jpg'];
+const CACHE = 'saqr-portfolio-v6';
+const SHELL = ['./', 'index.html', 'manifest.json?v=8', 'favicon.ico?v=8', 'icon-192.png?v=8', 'icon-512.png?v=8', 'apple-touch-icon.png?v=8', 'avatar.jpg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
